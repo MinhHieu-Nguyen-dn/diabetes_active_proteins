@@ -1,13 +1,17 @@
-import pandas as pd
-from chembl_webresource_client.new_client import new_client
+import math
 import os
+import pandas as pd
+import numpy as np
 from tqdm.auto import tqdm
+from rdkit import Chem
+from rdkit.Chem import MACCSkeys, rdFingerprintGenerator
+from chembl_webresource_client.new_client import new_client
 
 
 def get_dataset(uniprot_id, data_dir='data'):
     """
     Connect to ChEMBL to find, get, and save target and compound activity data
-    to the input data directory..
+    to the input data directory.
 
     :param uniprot_id: UniProt ID of the target of interest from UniProt website.
     :param data_dir: Path to data directory.
@@ -120,5 +124,76 @@ def get_dataset(uniprot_id, data_dir='data'):
     print('Get and save data: done with {}'.format(uniprot_id))
 
 
-get_dataset(uniprot_id='P15121')
-get_dataset(uniprot_id='P31639')
+def convert_ic50_to_pic50(IC50_value):
+    pIC50_value = 9 - math.log10(IC50_value)
+    return pIC50_value
+
+
+def smiles_to_fp(smiles, method="maccs", n_bits=2048):
+    """
+    Encode a molecule from a SMILES string into a fingerprint.
+
+    Parameters
+    ----------
+    smiles : str
+        The SMILES string defining the molecule.
+
+    method : str
+        The type of fingerprint to use. Default is MACCS keys.
+
+    n_bits : int
+        The length of the fingerprint.
+
+    Returns
+    -------
+    array
+        The fingerprint array.
+
+    """
+
+    # convert smiles to RDKit mol object
+    mol = Chem.MolFromSmiles(smiles)
+
+    if method == "maccs":
+        return np.array(MACCSkeys.GenMACCSKeys(mol))
+    if method == "morgan2":
+        fpg = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=n_bits)
+        return np.array(fpg.GetFingerprint(mol))
+    if method == "morgan3":
+        fpg = rdFingerprintGenerator.GetMorganGenerator(radius=3, fpSize=n_bits)
+        return np.array(fpg.GetFingerprint(mol))
+    else:
+        # NBVAL_CHECK_OUTPUT
+        print(f"Warning: Wrong method specified: {method}. Default will be used instead.")
+        return np.array(MACCSkeys.GenMACCSKeys(mol))
+
+
+def prepare_data_for_model(uniprot_id, data_dir='data'):
+    """
+
+    :param uniprot_id:
+    :param data_dir:
+    :return:
+    """
+    file_path = os.path.join('data', '{}.csv'.format(uniprot_id))
+    df = pd.read_csv(file_path, index_col=0)
+    # Add new column for fingerprints
+    df["fp"] = df["smiles"].apply(smiles_to_fp)
+    # Apply conversion IC50 to pIC50 to each row of the compounds DataFrame
+    df["pIC50"] = df.apply(lambda x: convert_ic50_to_pic50(x.IC50), axis=1)
+    # Create active column
+    df["active"] = df["pIC50"].apply(lambda x: 1 if x > 6 else 0)
+
+    # Save and return result
+    print("Added fp, pIC50, and active columns to {}".format(file_path))
+    new_file_path = os.path.join('data', 'processed_{}.csv'.format(uniprot_id))
+    print("Saved as {}".format(new_file_path))
+    df.to_csv(new_file_path)
+    return df
+
+
+# get_dataset(uniprot_id='P15121')
+# get_dataset(uniprot_id='P31639')
+
+prepare_data_for_model(uniprot_id='P15121')
+prepare_data_for_model(uniprot_id='P31639')
