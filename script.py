@@ -18,7 +18,7 @@ def predict(input_df):
     return result_AKR1B1, np.max(proba_AKR1B1, axis=1), result_SGLT2, np.max(proba_SGLT2, axis=1)
 
 
-st.set_page_config(page_title="Diabetes Target", layout="wide")
+st.set_page_config(page_title="Compounds vs. Diabetes Target", layout="wide")
 st.title('Predict: Compounds/Proteins Interactions')
 
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
