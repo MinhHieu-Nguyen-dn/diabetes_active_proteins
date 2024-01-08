@@ -192,8 +192,8 @@ def prepare_data_for_model(uniprot_id, data_dir='data'):
     return df
 
 
-# get_dataset(uniprot_id='P15121')
-# get_dataset(uniprot_id='P31639')
+get_dataset(uniprot_id='P15121')
+get_dataset(uniprot_id='P31639')
 
 prepare_data_for_model(uniprot_id='P15121')
 prepare_data_for_model(uniprot_id='P31639')
