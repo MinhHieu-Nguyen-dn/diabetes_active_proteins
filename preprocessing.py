@@ -6,6 +6,7 @@ from tqdm.auto import tqdm
 from rdkit import Chem
 from rdkit.Chem import MACCSkeys, rdFingerprintGenerator
 from chembl_webresource_client.new_client import new_client
+from sklearn.model_selection import train_test_split
 
 
 def get_dataset(uniprot_id, data_dir='data'):
@@ -192,8 +193,35 @@ def prepare_data_for_model(uniprot_id, data_dir='data'):
     return df
 
 
-get_dataset(uniprot_id='P15121')
-get_dataset(uniprot_id='P31639')
+def string_to_np_array(s: str):
+    s = s.strip('[]')
+    arr = np.fromstring(s, sep=' ')
 
-prepare_data_for_model(uniprot_id='P15121')
-prepare_data_for_model(uniprot_id='P31639')
+    return arr
+
+
+def df_to_data_split(df, random_seed=1):
+    fingerprint_to_model = df.fp.tolist()
+    label_to_model = df.active.tolist()
+
+    (
+        static_train_x,
+        static_test_x,
+        static_train_y,
+        static_test_y,
+    ) = train_test_split(fingerprint_to_model, label_to_model, test_size=0.2, random_state=random_seed)
+
+    splits = {
+        'x_train': static_train_x,
+        'x_test': static_test_x,
+        'y_train': static_train_y,
+        'y_test': static_test_y
+    }
+
+    return splits
+
+# get_dataset(uniprot_id='P15121')
+# get_dataset(uniprot_id='P31639')
+#
+# prepare_data_for_model(uniprot_id='P15121')
+# prepare_data_for_model(uniprot_id='P31639')
