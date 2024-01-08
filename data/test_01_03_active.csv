@@ -1,0 +1,2 @@
+molecule_chembl_id,smiles
+CHEMBL183937,Cc1cc(O)c(C(=O)CCc2ccc3occc3c2)c(O[C@@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)c1
