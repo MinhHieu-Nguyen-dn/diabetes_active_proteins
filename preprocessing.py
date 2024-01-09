@@ -2,7 +2,7 @@ import math
 import os
 import pandas as pd
 import numpy as np
-from tqdm.auto import tqdm
+# from tqdm.auto import tqdm
 from rdkit import Chem
 from rdkit.Chem import MACCSkeys, rdFingerprintGenerator
 from chembl_webresource_client.new_client import new_client
@@ -78,7 +78,8 @@ def get_dataset(uniprot_id, data_dir='data'):
     ).only("molecule_chembl_id", "molecule_structures")
 
     # Download compound data from ChEMBL: export the QuerySet object into a pandas DataFrame
-    compounds = list(tqdm(compounds_provider))
+    # compounds = list(tqdm(compounds_provider))
+    compounds = list(compounds_provider)
     compounds_df = pd.DataFrame.from_records(
         compounds,
     )
