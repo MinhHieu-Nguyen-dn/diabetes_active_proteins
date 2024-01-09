@@ -9,7 +9,8 @@ To lower the activity of these 2 proteins, compounds that are predicted "active"
 ## Outcome of the project:
 - User input: A compound or a list of compounds (format: SMILES) - CSV upload file.  
 - Output: Result with active/non-active labels corresponding to the interaction of each compound to SGLT2 and AR.
-![image](https://github.com/MinhHieu-Nguyen-dn/diabetes_active_proteins/assets/72367686/b4559d0b-4d8e-4fc8-9a7e-a2b134bf2834)
+![image](https://github.com/MinhHieu-Nguyen-dn/diabetes_active_proteins/assets/72367686/34f91303-4d5a-4b3b-b3e1-cb82ad8353ba)
+
 
 ## Dependencies and configure settings:
 - Virtual environment with Conda and Python 3.8.18:    
